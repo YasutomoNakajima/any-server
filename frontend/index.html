@@ -1,12 +1,78 @@
-<!-- code:web3-3 index.html -->
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golang!!</title>
-</head>
-<body>
-    Welcome Golang Server.
-</body>
-</html>
+<h1>MeTube</h1>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
+<video id="video_smaple" controls playsinline preload="none" oncontextmenu="return false;">
+    <div id="play">プレイ</div>
+    <div id="stop">ストップ</div>
+    <div id="atama">頭出し</div>
+    <div id="vol-up">音量アップ</div>
+    <div id="vol-down">音量ダウン</div>
+    <div id="mute">ミュート</div>
+    <p>音量：</p><div id="vol"></div>
+
+<script>
+    var videoSrc = 'http://localhost:8081/JULIA/index.m3u8'
+    const xhr = new XMLHttpRequest();
+	xhr.open('get', videoSrc);
+    xhr.overrideMimeType("audio/x-mpegurl");
+	xhr.onload = playHls(videoSrc);
+    xhr.send();
+
+    function playHls (videoSrc){
+        if(Hls.isSupported()) {
+            var video = document.getElementById('video_smaple');
+            var hls = new Hls();
+            hls.loadSource(videoSrc); //ここで.m3u8ファイルを指定
+            hls.attachMedia(video);
+        }
+    }
+
+    $(function(){ 
+        // 操作対象のvideoを指定
+        var video = $('#video_smaple').get(0); 
+        // 動画の再生 
+        $('#play').click(function(){
+        video.play();
+        }); 
+        // 動画の一時停止
+        $('#stop').click(function(){
+        video.pause(); 
+        });
+        // 動画の頭出し（任意の秒へ移動）
+        $('#atama').click(function(){
+        video.currentTime = 0; // 入れた秒の位置へ移動（例は0秒）
+        });
+        // 音声ミュート（トグル式）
+        $('#mute').click(function(){
+        video.muted = video.muted ? false : true;
+        }); 
+        //音量アップ
+        $('#vol-up').click(function(){
+        if(video.volume <= 0.75){
+            video.volume = video.volume + 0.25;
+            $("#vol").text(video.volume);
+        }
+        }); 
+        //音量ダウン
+        $('#vol-down').click(function(){
+        video.volume = video.volume - 0.25;
+        $("#vol").text(video.volume);
+        });
+        //音量表示
+        $("#vol").text(video.volume);
+    });
+    
+    
+</script>
+
+<style>
+    video {
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        display: block;
+        margin: auto;
+    }
+</style>
